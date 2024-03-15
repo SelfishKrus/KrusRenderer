@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KrusRenderer", "KrusRenderer.vcxproj", "{AAC4089D-9690-49D8-BB58-A1075CF5A65A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AAC4089D-9690-49D8-BB58-A1075CF5A65A}.Debug|x64.ActiveCfg = Debug|x64
+		{AAC4089D-9690-49D8-BB58-A1075CF5A65A}.Debug|x64.Build.0 = Debug|x64
+		{AAC4089D-9690-49D8-BB58-A1075CF5A65A}.Debug|x86.ActiveCfg = Debug|Win32
+		{AAC4089D-9690-49D8-BB58-A1075CF5A65A}.Debug|x86.Build.0 = Debug|Win32
+		{AAC4089D-9690-49D8-BB58-A1075CF5A65A}.Release|x64.ActiveCfg = Release|x64
+		{AAC4089D-9690-49D8-BB58-A1075CF5A65A}.Release|x64.Build.0 = Release|x64
+		{AAC4089D-9690-49D8-BB58-A1075CF5A65A}.Release|x86.ActiveCfg = Release|Win32
+		{AAC4089D-9690-49D8-BB58-A1075CF5A65A}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A565B54E-9601-430E-A721-277BBE00EEE3}
+	EndGlobalSection
+EndGlobal
