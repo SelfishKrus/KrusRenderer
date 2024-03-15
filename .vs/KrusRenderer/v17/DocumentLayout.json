@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{AAC4089D-9690-49D8-BB58-A1075CF5A65A}|KrusRenderer.vcxproj|solutionrelative:Resource\\main.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{AAC4089D-9690-49D8-BB58-A1075CF5A65A}|KrusRenderer.vcxproj|D:\\GithubProj\\KrusRenderer\\Resource\\model.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{AAC4089D-9690-49D8-BB58-A1075CF5A65A}|KrusRenderer.vcxproj|solutionrelative:Resource\\model.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{AAC4089D-9690-49D8-BB58-A1075CF5A65A}|KrusRenderer.vcxproj|D:\\GithubProj\\KrusRenderer\\Resource\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{AAC4089D-9690-49D8-BB58-A1075CF5A65A}|KrusRenderer.vcxproj|solutionrelative:Resource\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
@@ -28,7 +32,7 @@
               "RelativeDocumentMoniker": "Resource\\main.h",
               "ToolTip": "D:\\GithubProj\\KrusRenderer\\Resource\\main.h",
               "RelativeToolTip": "Resource\\main.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAuAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-03-13T09:39:43.082Z",
               "IsPinned": true,
@@ -37,12 +41,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "model.h",
+              "DocumentMoniker": "D:\\GithubProj\\KrusRenderer\\Resource\\model.h",
+              "RelativeDocumentMoniker": "Resource\\model.h",
+              "ToolTip": "D:\\GithubProj\\KrusRenderer\\Resource\\model.h",
+              "RelativeToolTip": "Resource\\model.h",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAARAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-03-15T07:18:54.327Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "main.cpp",
               "DocumentMoniker": "D:\\GithubProj\\KrusRenderer\\Resource\\main.cpp",
               "RelativeDocumentMoniker": "Resource\\main.cpp",
               "ToolTip": "D:\\GithubProj\\KrusRenderer\\Resource\\main.cpp",
               "RelativeToolTip": "Resource\\main.cpp",
-              "ViewState": "AQIAABgAAAAAAAAAAAAAACQAAAAgAAAA",
+              "ViewState": "AQIAACEAAAAAAAAAAAAAADkAAAAlAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-03-13T09:00:39.745Z",
               "EditorCaption": ""

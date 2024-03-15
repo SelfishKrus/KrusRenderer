@@ -1,0 +1,51 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "runs": [
+    {
+      "results": [],
+      "tool": {
+        "driver": {
+          "name": "PREfast",
+          "fullName": "PREfast Code Analysis",
+          "version": "14.39.33522.0",
+          "informationUri": "https://aka.ms/cpp/ca"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "file:///d:/githubproj/krusrenderer/resource/model.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ],
+          "hashes": {
+            "sha-256": "20bd4bce81e9af41da2a58ad6c5309175ff109b7b17f90b8a94ac74b93d63305"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/githubproj/krusrenderer/resource/model.h"
+          },
+          "hashes": {
+            "sha-256": "577ba28ebe6e12a8f9755866bac6961ebb033d63a36ee44177b381f0c9a99696"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/githubproj/krusrenderer/resource/geometry.h"
+          },
+          "hashes": {
+            "sha-256": "573244784240fa8b2c8c809607aeab50031729c7f720f6055283c21254834be4"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "runs": [
+    {
+      "results": [],
+      "tool": {
+        "driver": {
+          "name": "PREfast",
+          "fullName": "PREfast Code Analysis",
+          "version": "14.39.33522.0",
+          "informationUri": "https://aka.ms/cpp/ca"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "file:///d:/githubproj/krusrenderer/resource/main.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ],
+          "hashes": {
+            "sha-256": "0eddb0991c58cb89ca7041efd26a08e6ecb330428b19496db01b20a8b09f6704"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/githubproj/krusrenderer/resource/main.h"
+          },
+          "hashes": {
+            "sha-256": "b828ba48a3d7e95565946649850f367f4dfd251ee81494942414416fe3c4737a"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/githubproj/krusrenderer/resource/tgaimage.h"
+          },
+          "hashes": {
+            "sha-256": "be43ccbc42b88060fa880beec7b49f67617183f2edf1eeb6cf0c43c04266dca2"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/githubproj/krusrenderer/resource/model.h"
+          },
+          "hashes": {
+            "sha-256": "577ba28ebe6e12a8f9755866bac6961ebb033d63a36ee44177b381f0c9a99696"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///d:/githubproj/krusrenderer/resource/geometry.h"
+          },
+          "hashes": {
+            "sha-256": "573244784240fa8b2c8c809607aeab50031729c7f720f6055283c21254834be4"
+          }
+        }
+      ]
+    }
+  ]
+}
