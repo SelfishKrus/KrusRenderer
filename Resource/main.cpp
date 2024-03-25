@@ -48,16 +48,31 @@ void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color)
     }
 }
 
+void drawWireFrame(Model* model, TGAImage& image, TGAColor color)
+{
+    for (int i = 0; i < model->nfaces(); i++)
+    {   
+        std::vector <int> face = model->face(i);
+        for (int j = 0; j < 3; j++)
+        {
+			Vec3f v0 = model->vert(face[j]);
+			Vec3f v1 = model->vert(face[(j + 1) % 3]);
+			int x0 = (v0.x + 1.) * width / 2.;
+			int y0 = (v0.y + 1.) * height / 2.;
+			int x1 = (v1.x + 1.) * width / 2.;
+			int y1 = (v1.y + 1.) * height / 2.;
+			line(x0, y0, x1, y1, image, white);
+        }
+    }
+}
+
 int main(int argc, char** argv) 
 {
     // initialize the image 
     TGAImage image(width, height, TGAImage::RGB);
 
     // draw 
-    line(13, 20, 80, 40, image, white);
-    line(80, 40, 13, 20, image, red);
-
-    line(30, 20, 18, 50, image, red);
+    drawWireFrame(model, image, white);
 
 
     // write in 

@@ -1,2 +1,6 @@
 ﻿  main.cpp
-  KrusRenderer.vcxproj -> D:\GithubProj\KrusRenderer\x64\Debug\KrusRenderer.exe
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(60,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(61,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(62,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(63,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  KrusRenderer.vcxproj -> D:\GithubProjects\KrusRenderer\x64\Debug\KrusRenderer.exe
