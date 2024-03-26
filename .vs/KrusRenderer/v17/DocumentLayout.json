@@ -31,8 +31,7 @@
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABkAAAAPAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-03-13T09:39:43.082Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -42,7 +41,7 @@
               "RelativeDocumentMoniker": "Resource\\main.cpp",
               "ToolTip": "D:\\GithubProjects\\KrusRenderer\\Resource\\main.cpp",
               "RelativeToolTip": "Resource\\main.cpp",
-              "ViewState": "AQIAAGEAAAAAAAAAAAAqwHAAAAAgAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAHcAAACTAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-03-13T09:00:39.745Z",
               "EditorCaption": ""

@@ -3,6 +3,60 @@ D:\GithubProjects\KrusRenderer\Resource\main.cpp(61,11): warning C4244: 'initial
 D:\GithubProjects\KrusRenderer\Resource\main.cpp(62,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 D:\GithubProjects\KrusRenderer\Resource\main.cpp(63,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 D:\GithubProjects\KrusRenderer\Resource\main.cpp(64,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244: 'argument': conversion from 't' to 't', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244:         with
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244:             t=int
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244:         and
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244:             t=float
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,92): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244: 'argument': conversion from 't' to 't', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244:         with
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244:             t=int
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244:         and
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244:             t=float
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,63): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244: 'argument': conversion from 't' to 't', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244:         with
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244:             t=int
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244:         and
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244:             t=float
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,34): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244: 'argument': conversion from 't' to 't', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244:         with
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244:             t=int
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244:         and
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244:             t=float
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,182): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244: 'argument': conversion from 't' to 't', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244:         with
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244:             t=int
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244:         and
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244:             t=float
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,151): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244: 'argument': conversion from 't' to 't', possible loss of data
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244:         with
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244:             t=int
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244:         ]
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244:         and
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244:         [
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244:             t=float
+D:\GithubProjects\KrusRenderer\Resource\main.cpp(120,120): warning C4244:         ]
 D:\GithubProjects\KrusRenderer\Resource\geometry.h(18,75): warning C4244: 'argument': conversion from 'float' to 't', possible loss of data
 D:\GithubProjects\KrusRenderer\Resource\geometry.h(18,75): warning C4244:         with
 D:\GithubProjects\KrusRenderer\Resource\geometry.h(18,75): warning C4244:         [
@@ -15,8 +69,8 @@ D:\GithubProjects\KrusRenderer\Resource\geometry.h(18,75): warning C4244:       
   	see reference to class template instantiation 'Vec2<int>' being compiled
   	D:\GithubProjects\KrusRenderer\Resource\geometry.h(18,17):
   	while compiling class template member function 'Vec2<int> Vec2<int>::operator *(float) const'
-  		D:\GithubProjects\KrusRenderer\Resource\main.cpp(96,31):
-  		see the first reference to 'Vec2<int>::operator *' in 'RasterizeTriangle'
+  		D:\GithubProjects\KrusRenderer\Resource\main.cpp(97,31):
+  		see the first reference to 'Vec2<int>::operator *' in 'RasterizeTriangle_LS'
   
 D:\GithubProjects\KrusRenderer\Resource\geometry.h(18,70): warning C4244: 'argument': conversion from 'float' to 't', possible loss of data
 D:\GithubProjects\KrusRenderer\Resource\geometry.h(18,70): warning C4244:         with
