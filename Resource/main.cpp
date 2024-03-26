@@ -122,7 +122,6 @@ Vec3f Barycentric(Triangle triangle, Vec2i P)
     return Vec3f(1.0f-(u.x+u.y)/u.z, u.x/u.z, u.y/u.z);
 }
 
-
 // Barycentric Coordinate
 void RasterizeTriangle_BC(Triangle triangle, TGAImage& image, TGAColor color)
 {   
@@ -154,6 +153,23 @@ void RasterizeTriangle_BC(Triangle triangle, TGAImage& image, TGAColor color)
     }
 }
 
+void FlatShading(Model* model, TGAImage image, TGAColor color)
+{
+    for (int i = 0; i < model->nfaces(); i++)
+    {
+        std::vector <int> face = model->face(i);
+        for (int j = 0; j < 3; j++)
+        {
+            Vec3f posWS = model->vert(face[j]);
+            Triangle tri;
+            tri.p0 = Vec2i((posWS.x + 1.) * width / 2., (posWS.y + 1.) * height / 2.);
+            tri.p1 = Vec2i((posWS.x + 1.) * width / 2., (posWS.y + 1.) * height / 2.);
+            tri.p2 = Vec2i((posWS.x + 1.) * width / 2., (posWS.y + 1.) * height / 2.);
+            RasterizeTriangle_BC(tri, image, color);
+        }
+    }
+}
+
 int main(int argc, char** argv) 
 {
     // initialize the image 
@@ -161,8 +177,9 @@ int main(int argc, char** argv)
 
     // draw 
     //DrawWireframe(model, image, white);
-    RasterizeTriangle_BC(triangle, image, red);
-    DrawTriangleWireframe(triangle, image, white);
+    //RasterizeTriangle_BC(triangle, image, red);
+    //DrawTriangleWireframe(triangle, image, white);
+    FlatShading(model, image, white);
 
     // write in 
     image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
