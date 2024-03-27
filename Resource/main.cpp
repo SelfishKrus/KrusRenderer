@@ -1,5 +1,7 @@
 ﻿#include "main.h"
 
+#include <iostream>
+
 // Bresenham’s line drawing algorithm
 void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color) 
 {
@@ -151,22 +153,37 @@ void RasterizeTriangle_BC(Triangle triangle, TGAImage& image, TGAColor color)
             image.set(i, j, color);
         }
     }
+    std::cout << "RasterizeTriangle_BC" << std::endl;
 }
 
 void FlatShading(Model* model, TGAImage image, TGAColor color)
-{
-    for (int i = 0; i < model->nfaces(); i++)
-    {
+{   
+    std::cout << model->nfaces() << std::endl;
+    for (int i = 0; i < (model->nfaces()); i++)
+    {   
+        // print nfaces()
+        std::cout << i << std::endl;
+
         std::vector <int> face = model->face(i);
+        float width = image.get_width();
+        float height = image.get_height();
+
+        // get face-vertex coordinate 
+        Vec2i posSS[3];
         for (int j = 0; j < 3; j++)
         {
             Vec3f posWS = model->vert(face[j]);
-            Triangle tri;
-            tri.p0 = Vec2i((posWS.x + 1.) * width / 2., (posWS.y + 1.) * height / 2.);
-            tri.p1 = Vec2i((posWS.x + 1.) * width / 2., (posWS.y + 1.) * height / 2.);
-            tri.p2 = Vec2i((posWS.x + 1.) * width / 2., (posWS.y + 1.) * height / 2.);
-            RasterizeTriangle_BC(tri, image, color);
+            posSS[j] = Vec2i((posWS.x + 1.) * width / 2., (posWS.y + 1.) * height / 2.);
         }
+
+        // transfer to triangle 
+        Triangle tri;
+        tri.p0 = posSS[0];
+        tri.p1 = posSS[1];
+        tri.p2 = posSS[2];
+        std::cout << tri.p0 << ' ' << tri.p1 << ' ' << tri.p0 << std::endl;
+
+        RasterizeTriangle_BC(tri, image, color);
     }
 }
 
@@ -177,12 +194,13 @@ int main(int argc, char** argv)
 
     // draw 
     //DrawWireframe(model, image, white);
-    //RasterizeTriangle_BC(triangle, image, red);
+    RasterizeTriangle_BC(triangle, image, red);
     //DrawTriangleWireframe(triangle, image, white);
-    FlatShading(model, image, white);
+    FlatShading(model, image, red);
 
     // write in 
-    image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
+    // origin at screen bottom-left
+    image.flip_vertically();
     image.write_tga_file("framebuffer.tga");
     return 0;
 }
