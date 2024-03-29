@@ -7,8 +7,8 @@ const TGAColor red = TGAColor(255, 0, 0, 255);
 const TGAColor green = TGAColor(0, 255, 0, 255);
 const TGAColor blue = TGAColor(0, 0, 255, 255);
 
-const int width = 256;
-const int height = 256;
+const int width = 1024;
+const int height = 1024;
 
 Model *model = new Model("obj/diablo3_pose/diablo3_pose.obj");
 

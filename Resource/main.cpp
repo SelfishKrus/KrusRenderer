@@ -156,24 +156,23 @@ void RasterizeTriangle_BC(Triangle triangle, TGAImage& image, TGAColor color)
     std::cout << "RasterizeTriangle_BC" << std::endl;
 }
 
-void FlatShading(Model* model, TGAImage image, TGAColor color)
+void FlatShading(Model* model, TGAImage& image, TGAColor color)
 {   
     std::cout << model->nfaces() << std::endl;
     for (int i = 0; i < (model->nfaces()); i++)
     {   
-        // print nfaces()
-        std::cout << i << std::endl;
-
         std::vector <int> face = model->face(i);
         float width = image.get_width();
         float height = image.get_height();
 
         // get face-vertex coordinate 
         Vec2i posSS[3];
+        Vec3f posWS[3];
         for (int j = 0; j < 3; j++)
         {
-            Vec3f posWS = model->vert(face[j]);
-            posSS[j] = Vec2i((posWS.x + 1.) * width / 2., (posWS.y + 1.) * height / 2.);
+            Vec3f vertex = model->vert(face[j]);
+            posWS[j] = vertex;
+            posSS[j] = Vec2i((vertex.x + 1.) * width / 2., (vertex.y + 1.) * height / 2.);
         }
 
         // transfer to triangle 
@@ -181,9 +180,19 @@ void FlatShading(Model* model, TGAImage image, TGAColor color)
         tri.p0 = posSS[0];
         tri.p1 = posSS[1];
         tri.p2 = posSS[2];
-        std::cout << tri.p0 << ' ' << tri.p1 << ' ' << tri.p0 << std::endl;
 
-        RasterizeTriangle_BC(tri, image, color);
+        // Blinn-Phong
+        Vec3f lightDirWS = Vec3f(0, 0, -1);
+        Vec3f normalWS = (posWS[2] - posWS[0]) ^ (posWS[1] - posWS[0]);
+        normalWS.normalize();
+        float NoL = normalWS * lightDirWS;
+        float shadingCol = NoL * 255.f;
+
+        if (NoL > 0)
+        {
+            RasterizeTriangle_BC(tri, image, TGAColor(shadingCol, shadingCol, shadingCol, 255));
+        }
+        //DrawTriangleWireframe(tri, image, white);
     }
 }
 
@@ -194,7 +203,7 @@ int main(int argc, char** argv)
 
     // draw 
     //DrawWireframe(model, image, white);
-    RasterizeTriangle_BC(triangle, image, red);
+    //RasterizeTriangle_BC(triangle, image, red);
     //DrawTriangleWireframe(triangle, image, white);
     FlatShading(model, image, red);
 
