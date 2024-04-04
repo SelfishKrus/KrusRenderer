@@ -125,35 +125,37 @@ Vec3f Barycentric(Triangle triangle, Vec2i P)
 }
 
 // Barycentric Coordinate
-void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& image, TGAColor color)
+void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor defaultCol)
 {   
     // Get bounding box of the triangle
     Vec2i bboxMin = Vec2i(image.get_width() - 1, image.get_height() - 1);
     Vec2i bboxMax = Vec2i(0, 0);
     Vec2i clamp(image.get_width() - 1, image.get_height() - 1);
 
-    Vec3i faceVertices[3] = { triangle.p0, triangle.p1, triangle.p2 };
+    Vec3i pos_faceVertices[3] = { triangle.p0, triangle.p1, triangle.p2 };
+    Vec2f uv_faceVertices[3] = { triangle.p0_uv, triangle.p1_uv, triangle.p2_uv };
     for (int i = 0; i < 3; i++) 
     {
-        bboxMin.x = std::max(0, std::min(bboxMin.x, faceVertices[i].x));
-        bboxMin.y = std::max(0, std::min(bboxMin.y, faceVertices[i].y));
-        bboxMax.x = std::min(clamp.x, std::max(bboxMax.x, faceVertices[i].x));
-        bboxMax.y = std::min(clamp.y, std::max(bboxMax.y, faceVertices[i].y));
+        bboxMin.x = std::max(0, std::min(bboxMin.x, pos_faceVertices[i].x));
+        bboxMin.y = std::max(0, std::min(bboxMin.y, pos_faceVertices[i].y));
+        bboxMax.x = std::min(clamp.x, std::max(bboxMax.x, pos_faceVertices[i].x));
+        bboxMax.y = std::min(clamp.y, std::max(bboxMax.y, pos_faceVertices[i].y));
     }
 
     // Rasterize each pixel inside the bounding box 
     // inside the triangle - fill 
     // outside the triangle - blank
-    Vec3i P_SS;
-    for (P_SS.x = bboxMin.x; P_SS.x <= bboxMax.x; P_SS.x++)
+    Vec3i ptSS;
+    for (ptSS.x = bboxMin.x; ptSS.x <= bboxMax.x; ptSS.x++)
     {
-        for (P_SS.y = bboxMin.y; P_SS.y <= bboxMax.y; P_SS.y++)
+        for (ptSS.y = bboxMin.y; ptSS.y <= bboxMax.y; ptSS.y++)
         {
-            Vec3f bc_screen = Barycentric(triangle, Vec2i(P_SS.x, P_SS.y));
+            Vec3f bc_screen = Barycentric(triangle, Vec2i(ptSS.x, ptSS.y));
             if (bc_screen.x < 0 || bc_screen.y < 0 || bc_screen.z < 0) continue;
             
             // lerp z-value by barycentric coordinate
-            P_SS.z = 0;
+            ptSS.z = 0;
+            Vec2f uv = {0.f, 0.f};
             for (int index = 0; index < 3; index++)
             {
                 float bc_component;
@@ -163,21 +165,23 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& image, TGAC
                     case 1: bc_component = bc_screen.y; break;
                     case 2: bc_component = bc_screen.z; break;
                 }
-                P_SS.z += faceVertices[index].z * bc_component;
+                ptSS.z += pos_faceVertices[index].z * bc_component;
+                uv = uv + uv_faceVertices[index] * bc_component;
 			}
             // Z Test 
-            if (zBuffer[P_SS.x + P_SS.y * image.get_width()] < P_SS.z)
+            if (zBuffer[ptSS.x + ptSS.y * image.get_width()] < ptSS.z)
             {
-				zBuffer[P_SS.x + P_SS.y * image.get_width()] = P_SS.z;
-                image.set(P_SS.x, P_SS.y, color);
+				zBuffer[ptSS.x + ptSS.y * image.get_width()] = ptSS.z;
+                TGAColor col = diffuseTex.get(uv.x * diffuseTex.get_width(), uv.y * diffuseTex.get_height());
+                //std::cout << uv.x << " " << uv.y << std::endl;
+                image.set(ptSS.x, ptSS.y, defaultCol);
             }
         }
     }
 }
 
-void FlatShading(Model *model, int* zBuffer, TGAImage& image, TGAColor color)
+void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor color)
 {   
-    std::cout << model->nfaces() << std::endl;
     for (int i = 0; i < (model->nfaces()); i++)
     {   
         std::vector <int> face = model->face(i);
@@ -200,6 +204,12 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& image, TGAColor color)
         tri.p1 = posSS[1];
         tri.p2 = posSS[2];
 
+        tri.p0_uv = model->uv(i, 0);
+        tri.p1_uv = model->uv(i, 1);
+        tri.p2_uv = model->uv(i, 2);
+        std::cout << tri.p0_uv << std::endl;
+
+
         // Blinn-Phong
         Vec3f lightDirWS = Vec3f(0, 0, -1);
         Vec3f normalWS = (posWS[2] - posWS[0]) ^ (posWS[1] - posWS[0]);
@@ -209,9 +219,8 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& image, TGAColor color)
 
         if (NoL > 0)
         {
-            RasterizeTriangle_BC(tri, zBuffer, image, TGAColor(shadingCol, shadingCol, shadingCol, 255));
+            RasterizeTriangle_BC(tri, zBuffer, diffuseTex, image, TGAColor(shadingCol, shadingCol, shadingCol, 255));
         }
-        //DrawTriangleWireframe(tri, image, white);
     }
 }
 
@@ -222,11 +231,16 @@ int main(int argc, char** argv)
     // 2d z-buffer to 1d array
     int* zBuffer = new int[width * height];
 
+    // read textures
+    TGAImage diffuseTex = TGAImage();
+    diffuseTex.read_tga_file("obj/african_head/african_head_diffuse.tga");
+    std::cout << diffuseTex.get_width() << " " << diffuseTex.get_height() << std::endl;
+
     // draw 
     //DrawWireframe(model, image, white);
     //RasterizeTriangle_BC(triangle, image, red);
     //DrawTriangleWireframe(triangle, image, white);
-    FlatShading(model, zBuffer, image, red);
+    FlatShading(model, zBuffer, diffuseTex, image, red);
 
     // write in 
     // origin at screen bottom-left

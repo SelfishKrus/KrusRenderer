@@ -11,13 +11,16 @@ const int width = 1024;
 const int height = 1024;
 const int depth = 256;
 
-Model *model = new Model("obj/diablo3_pose/diablo3_pose.obj");
+Model *model = new Model("obj/african_head/african_head.obj");
 
 struct Triangle
 {
 	Vec3i p0;
 	Vec3i p1;
 	Vec3i p2;
+	Vec2f p0_uv;
+	Vec2f p1_uv;
+	Vec2f p2_uv;
 };
 
 Triangle triangle
