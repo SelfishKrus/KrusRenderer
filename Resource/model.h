@@ -1,20 +1,28 @@
-#ifndef __MODEL_H__
-#define __MODEL_H__
-
 #include <vector>
+#include <string>
 #include "geometry.h"
+#include "tgaimage.h"
 
 class Model {
-private:
-	std::vector<Vec3f> verts_;
-	std::vector<std::vector<int> > faces_;
+    std::vector<Vec3f> verts{};     // array of vertices
+    std::vector<Vec2f> tex_coord{}; // per-vertex array of tex coords
+    std::vector<Vec3f> norms{};     // per-vertex array of normal vectors
+    std::vector<int> facet_vrt{};
+    std::vector<int> facet_tex{};  // per-triangle indices in the above arrays
+    std::vector<int> facet_nrm{};
+    TGAImage diffusemap{};         // diffuse color texture
+    TGAImage normalmap{};          // normal map texture
+    TGAImage specularmap{};        // specular map texture
+    void load_texture(const std::string filename, const std::string suffix, TGAImage& img);
 public:
-	Model(const char *filename);
-	~Model();
-	int nverts();
-	int nfaces();
-	Vec3f vert(int i);
-	std::vector<int> face(int idx);
+    Model(const std::string filename);
+    int nverts() const;
+    int nfaces() const;
+    Vec3f normal(const int iface, const int nthvert) const; // per triangle corner normal vertex
+    Vec3f normal(const Vec2f& uv) const;                     // fetch the normal vector from the normal map texture
+    Vec3f vert(const int i) const;
+    Vec3f vert(const int iface, const int nthvert) const;
+    Vec2f uv(const int iface, const int nthvert) const;
+    const TGAImage& diffuse()  const { return diffusemap; }
+    const TGAImage& specular() const { return specularmap; }
 };
-
-#endif //__MODEL_H__

@@ -55,11 +55,10 @@ void DrawWireframe(Model* model, TGAImage& image, TGAColor color)
 {
     for (int i = 0; i < model->nfaces(); i++)
     {   
-        std::vector <int> face = model->face(i);
         for (int j = 0; j < 3; j++)
         {
-			Vec3f v0 = model->vert(face[j]);
-			Vec3f v1 = model->vert(face[(j + 1) % 3]);
+			Vec3f v0 = model->vert(i, j);
+            Vec3f v1 = model->vert(i, (j + 1) % 3);
 			int x0 = (v0.x + 1.) * width / 2.;
 			int y0 = (v0.y + 1.) * height / 2.;
 			int x1 = (v1.x + 1.) * width / 2.;
@@ -128,9 +127,9 @@ Vec3f Barycentric(Triangle triangle, Vec2i P)
 void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor defaultCol)
 {   
     // Get bounding box of the triangle
-    Vec2i bboxMin = Vec2i(image.get_width() - 1, image.get_height() - 1);
+    Vec2i bboxMin = Vec2i(image.width() - 1, image.height() - 1);
     Vec2i bboxMax = Vec2i(0, 0);
-    Vec2i clamp(image.get_width() - 1, image.get_height() - 1);
+    Vec2i clamp(image.width() - 1, image.height() - 1);
 
     Vec3i pos_faceVertices[3] = { triangle.p0, triangle.p1, triangle.p2 };
     Vec2f uv_faceVertices[3] = { triangle.p0_uv, triangle.p1_uv, triangle.p2_uv };
@@ -169,10 +168,10 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
                 uv = uv + uv_faceVertices[index] * bc_component;
 			}
             // Z Test 
-            if (zBuffer[ptSS.x + ptSS.y * image.get_width()] < ptSS.z)
+            if (zBuffer[ptSS.x + ptSS.y * image.width()] < ptSS.z)
             {
-				zBuffer[ptSS.x + ptSS.y * image.get_width()] = ptSS.z;
-                TGAColor col = diffuseTex.get(uv.x * diffuseTex.get_width(), uv.y * diffuseTex.get_height());
+				zBuffer[ptSS.x + ptSS.y * image.width()] = ptSS.z;
+                TGAColor col = diffuseTex.get(uv.x * diffuseTex.width(), uv.y * diffuseTex.height());
                 //std::cout << uv.x << " " << uv.y << std::endl;
                 image.set(ptSS.x, ptSS.y, defaultCol);
             }
@@ -184,16 +183,15 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& ima
 {   
     for (int i = 0; i < (model->nfaces()); i++)
     {   
-        std::vector <int> face = model->face(i);
-        float width = image.get_width();
-        float height = image.get_height();
+        float width = image.width();
+        float height = image.height();
 
         // get face-vertex coordinate 
         Vec3i posSS[3];
         Vec3f posWS[3];
         for (int j = 0; j < 3; j++)
         {
-            Vec3f vertex = model->vert(face[j]);
+            Vec3f vertex = model->vert(i, j);
             posWS[j] = vertex;
             posSS[j] = Vec3i((vertex.x + 1.) * width / 2., (vertex.y + 1.) * height / 2., (vertex.z + 1.) * depth / 2.);
         }
@@ -204,10 +202,6 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& ima
         tri.p1 = posSS[1];
         tri.p2 = posSS[2];
 
-        tri.p0_uv = model->uv(i, 0);
-        tri.p1_uv = model->uv(i, 1);
-        tri.p2_uv = model->uv(i, 2);
-        std::cout << tri.p0_uv << std::endl;
 
 
         // Blinn-Phong
@@ -234,7 +228,7 @@ int main(int argc, char** argv)
     // read textures
     TGAImage diffuseTex = TGAImage();
     diffuseTex.read_tga_file("obj/african_head/african_head_diffuse.tga");
-    std::cout << diffuseTex.get_width() << " " << diffuseTex.get_height() << std::endl;
+    std::cout << diffuseTex.width() << " " << diffuseTex.height() << std::endl;
 
     // draw 
     //DrawWireframe(model, image, white);
@@ -243,8 +237,6 @@ int main(int argc, char** argv)
     FlatShading(model, zBuffer, diffuseTex, image, red);
 
     // write in 
-    // origin at screen bottom-left
-    image.flip_vertically();
     image.write_tga_file("framebuffer.tga");
     return 0;
 }
