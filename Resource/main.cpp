@@ -172,8 +172,7 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
             {
 				zBuffer[ptSS.x + ptSS.y * image.width()] = ptSS.z;
                 TGAColor col = diffuseTex.get(uv.x * diffuseTex.width(), uv.y * diffuseTex.height());
-                //std::cout << uv.x << " " << uv.y << std::endl;
-                image.set(ptSS.x, ptSS.y, defaultCol);
+                image.set(ptSS.x, ptSS.y, col);
             }
         }
     }
@@ -181,7 +180,7 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
 
 void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor color)
 {   
-    for (int i = 0; i < (model->nfaces()); i++)
+    for (int faceIdx = 0; faceIdx < (model->nfaces()); faceIdx++)
     {   
         float width = image.width();
         float height = image.height();
@@ -191,7 +190,7 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& ima
         Vec3f posWS[3];
         for (int j = 0; j < 3; j++)
         {
-            Vec3f vertex = model->vert(i, j);
+            Vec3f vertex = model->vert(faceIdx, j);
             posWS[j] = vertex;
             posSS[j] = Vec3i((vertex.x + 1.) * width / 2., (vertex.y + 1.) * height / 2., (vertex.z + 1.) * depth / 2.);
         }
@@ -202,7 +201,9 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& ima
         tri.p1 = posSS[1];
         tri.p2 = posSS[2];
 
-
+        tri.p0_uv = model->uv(faceIdx, 0);
+        tri.p1_uv = model->uv(faceIdx, 2);
+        tri.p2_uv = model->uv(faceIdx, 1);
 
         // Blinn-Phong
         Vec3f lightDirWS = Vec3f(0, 0, -1);
@@ -225,11 +226,6 @@ int main(int argc, char** argv)
     // 2d z-buffer to 1d array
     int* zBuffer = new int[width * height];
 
-    // read textures
-    TGAImage diffuseTex = TGAImage();
-    diffuseTex.read_tga_file("obj/african_head/african_head_diffuse.tga");
-    std::cout << diffuseTex.width() << " " << diffuseTex.height() << std::endl;
-
     // draw 
     //DrawWireframe(model, image, white);
     //RasterizeTriangle_BC(triangle, image, red);
@@ -237,6 +233,7 @@ int main(int argc, char** argv)
     FlatShading(model, zBuffer, diffuseTex, image, red);
 
     // write in 
+    //image.flip_vertically();
     image.write_tga_file("framebuffer.tga");
     return 0;
 }

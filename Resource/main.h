@@ -11,7 +11,8 @@ const int width = 1024;
 const int height = 1024;
 const int depth = 256;
 
-Model *model = new Model("obj/african_head/african_head.obj");
+Model *model = new Model("obj/diablo3_pose/diablo3_pose.obj");
+TGAImage diffuseTex = TGAImage("obj/diablo3_pose/diablo3_pose_diffuse.tga");
 
 struct Triangle
 {
