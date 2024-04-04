@@ -96,8 +96,8 @@ void RasterizeTriangle_LS(Triangle triangle, TGAImage& image, TGAColor color)
         float beta = (float)(y - triangle.p0.y) / segmentHeight;
         
         // start pt & end pt of the scanline
-        Vec2i A = triangle.p0 + (triangle.p2 - triangle.p0) * alpha;
-        Vec2i B = triangle.p0 + (triangle.p1 - triangle.p0) * beta;
+        Vec2i A = Vec2i(triangle.p0.x, triangle.p0.y) + Vec2i(triangle.p2.x - triangle.p0.x, triangle.p2.y - triangle.p0.y) * alpha;
+        Vec2i B = Vec2i(triangle.p0.x, triangle.p0.y) + Vec2i(triangle.p1.x - triangle.p0.x, triangle.p1.y - triangle.p0.y) * beta;
         
         line(A.x, y, B.x, y, image, color);
     }
@@ -110,8 +110,8 @@ void RasterizeTriangle_LS(Triangle triangle, TGAImage& image, TGAColor color)
         float alpha = (float)(y - triangle.p0.y) / totalHeight;
         float beta = (float)(y - triangle.p1.y) / segmentHeight;
 
-        Vec2i A = triangle.p0 + (triangle.p2 - triangle.p0) * alpha;
-        Vec2i B = triangle.p1 + (triangle.p2 - triangle.p1) * beta;
+        Vec2i A = Vec2i(triangle.p0.x, triangle.p0.y) + Vec2i(triangle.p2.x - triangle.p0.x, triangle.p2.y - triangle.p0.y) * alpha;
+        Vec2i B = Vec2i(triangle.p1.x, triangle.p1.y) + Vec2i(triangle.p2.x - triangle.p1.x, triangle.p2.y - triangle.p1.y) * beta;
 
         line(A.x, y, B.x, y, image, color);
     }
@@ -125,38 +125,57 @@ Vec3f Barycentric(Triangle triangle, Vec2i P)
 }
 
 // Barycentric Coordinate
-void RasterizeTriangle_BC(Triangle triangle, TGAImage& image, TGAColor color)
+void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& image, TGAColor color)
 {   
     // Get bounding box of the triangle
     Vec2i bboxMin = Vec2i(image.get_width() - 1, image.get_height() - 1);
     Vec2i bboxMax = Vec2i(0, 0);
     Vec2i clamp(image.get_width() - 1, image.get_height() - 1);
 
-    Vec2i vertices[3] = { triangle.p0, triangle.p1, triangle.p2 };
+    Vec3i faceVertices[3] = { triangle.p0, triangle.p1, triangle.p2 };
     for (int i = 0; i < 3; i++) 
     {
-        bboxMin.x = std::max(0, std::min(bboxMin.x, vertices[i].x));
-        bboxMin.y = std::max(0, std::min(bboxMin.y, vertices[i].y));
-        bboxMax.x = std::min(clamp.x, std::max(bboxMax.x, vertices[i].x));
-        bboxMax.y = std::min(clamp.y, std::max(bboxMax.y, vertices[i].y));
+        bboxMin.x = std::max(0, std::min(bboxMin.x, faceVertices[i].x));
+        bboxMin.y = std::max(0, std::min(bboxMin.y, faceVertices[i].y));
+        bboxMax.x = std::min(clamp.x, std::max(bboxMax.x, faceVertices[i].x));
+        bboxMax.y = std::min(clamp.y, std::max(bboxMax.y, faceVertices[i].y));
     }
 
     // Rasterize each pixel inside the bounding box 
     // inside the triangle - fill 
     // outside the triangle - blank
-    for (int i = bboxMin.x; i <= bboxMax.x; i++)
+    Vec3i P_SS;
+    for (P_SS.x = bboxMin.x; P_SS.x <= bboxMax.x; P_SS.x++)
     {
-        for (int j = bboxMin.y; j <= bboxMax.y; j++)
+        for (P_SS.y = bboxMin.y; P_SS.y <= bboxMax.y; P_SS.y++)
         {
-            Vec3f bc_screen = Barycentric(triangle, Vec2i(i, j));
+            Vec3f bc_screen = Barycentric(triangle, Vec2i(P_SS.x, P_SS.y));
             if (bc_screen.x < 0 || bc_screen.y < 0 || bc_screen.z < 0) continue;
-            image.set(i, j, color);
+            
+            // lerp z-value by barycentric coordinate
+            P_SS.z = 0;
+            for (int index = 0; index < 3; index++)
+            {
+                float bc_component;
+                switch (index) 
+                {
+                    case 0: bc_component = bc_screen.x; break;
+                    case 1: bc_component = bc_screen.y; break;
+                    case 2: bc_component = bc_screen.z; break;
+                }
+                P_SS.z += faceVertices[index].z * bc_component;
+			}
+            // Z Test 
+            if (zBuffer[P_SS.x + P_SS.y * image.get_width()] < P_SS.z)
+            {
+				zBuffer[P_SS.x + P_SS.y * image.get_width()] = P_SS.z;
+                image.set(P_SS.x, P_SS.y, color);
+            }
         }
     }
-    std::cout << "RasterizeTriangle_BC" << std::endl;
 }
 
-void FlatShading(Model* model, TGAImage& image, TGAColor color)
+void FlatShading(Model *model, int* zBuffer, TGAImage& image, TGAColor color)
 {   
     std::cout << model->nfaces() << std::endl;
     for (int i = 0; i < (model->nfaces()); i++)
@@ -166,13 +185,13 @@ void FlatShading(Model* model, TGAImage& image, TGAColor color)
         float height = image.get_height();
 
         // get face-vertex coordinate 
-        Vec2i posSS[3];
+        Vec3i posSS[3];
         Vec3f posWS[3];
         for (int j = 0; j < 3; j++)
         {
             Vec3f vertex = model->vert(face[j]);
             posWS[j] = vertex;
-            posSS[j] = Vec2i((vertex.x + 1.) * width / 2., (vertex.y + 1.) * height / 2.);
+            posSS[j] = Vec3i((vertex.x + 1.) * width / 2., (vertex.y + 1.) * height / 2., (vertex.z + 1.) * depth / 2.);
         }
 
         // transfer to triangle 
@@ -190,7 +209,7 @@ void FlatShading(Model* model, TGAImage& image, TGAColor color)
 
         if (NoL > 0)
         {
-            RasterizeTriangle_BC(tri, image, TGAColor(shadingCol, shadingCol, shadingCol, 255));
+            RasterizeTriangle_BC(tri, zBuffer, image, TGAColor(shadingCol, shadingCol, shadingCol, 255));
         }
         //DrawTriangleWireframe(tri, image, white);
     }
@@ -200,12 +219,14 @@ int main(int argc, char** argv)
 {
     // initialize the image 
     TGAImage image(width, height, TGAImage::RGB);
+    // 2d z-buffer to 1d array
+    int* zBuffer = new int[width * height];
 
     // draw 
     //DrawWireframe(model, image, white);
     //RasterizeTriangle_BC(triangle, image, red);
     //DrawTriangleWireframe(triangle, image, white);
-    FlatShading(model, image, red);
+    FlatShading(model, zBuffer, image, red);
 
     // write in 
     // origin at screen bottom-left

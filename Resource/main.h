@@ -9,19 +9,20 @@ const TGAColor blue = TGAColor(0, 0, 255, 255);
 
 const int width = 1024;
 const int height = 1024;
+const int depth = 256;
 
 Model *model = new Model("obj/diablo3_pose/diablo3_pose.obj");
 
 struct Triangle
 {
-	Vec2i p0;
-	Vec2i p1;
-	Vec2i p2;
+	Vec3i p0;
+	Vec3i p1;
+	Vec3i p2;
 };
 
 Triangle triangle
 {
-	Vec2i(45, 180),
-	Vec2i(220, 120),
-	Vec2i(130, 50)
+	Vec3i(45, 180, 0),
+	Vec3i(220, 120, 0),
+	Vec3i(130, 50, 0)
 };
