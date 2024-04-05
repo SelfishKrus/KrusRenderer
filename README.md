@@ -7,3 +7,4 @@ Personal Notes: https://sleepy-badge-984.notion.site/TinyRenderer-22458c8f05724d
 ## C2 & C3 - ZBuffer and UV
 ![diablo3_pose_flatShading](https://github.com/SelfishKrus/KrusRenderer/assets/79186991/acaa6e0e-dffb-498a-a0e5-4ca1acb34356)
 ![diablo3_pose_baseCol](https://github.com/SelfishKrus/KrusRenderer/assets/79186991/950a96d3-ebfa-4a94-a874-e3d4a5443fcc)
+![diablo3_pose_depth](https://github.com/SelfishKrus/KrusRenderer/assets/79186991/a62169b4-da51-4aaa-9534-47555717245f)
