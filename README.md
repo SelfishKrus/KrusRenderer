@@ -1,5 +1,6 @@
 # KrusRenderer
 A soft rasterizer leanring project from tinyRenderer
+
 Personal Notes: https://sleepy-badge-984.notion.site/TinyRenderer-22458c8f05724d909f9907847c6b668b?pvs=4
 ## C1 - Wireframe
 ![diablo3_pose_wireframe](https://github.com/SelfishKrus/KrusRenderer/assets/79186991/b7333ab3-1947-47e5-9139-74475dbb1f98)
