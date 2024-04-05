@@ -22,6 +22,9 @@ struct Triangle
 	Vec2f p0_uv;
 	Vec2f p1_uv;
 	Vec2f p2_uv;
+	Vec3f p0_normalOS;
+	Vec3f p1_normalOS;
+	Vec3f p2_normalOS;
 };
 
 Triangle triangle

@@ -3,6 +3,8 @@
 #include <fstream>
 #include <vector>
 
+#include "geometry.h"
+
 #pragma pack(push,1)
 struct TGAHeader {
     std::uint8_t  idlength = 0;
@@ -31,6 +33,10 @@ struct TGAColor {
     TGAColor(std::uint8_t val1, std::uint8_t val2, std::uint8_t val3, std::uint8_t val4, std::uint8_t bpp) : bgra{ val1, val2, val3, val4 }, bytespp(bpp) {}
 
     std::uint8_t& operator[](const int i) { return bgra[i]; }
+
+    Vec3f toVec3f() const {
+        return Vec3f(bgra[2] / 255.0f, bgra[1] / 255.0f, bgra[0] / 255.0f);
+    }
 };
 
 struct TGAImage {
