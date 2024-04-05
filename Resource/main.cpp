@@ -1,6 +1,17 @@
 ﻿#include "main.h"
+#include "geometry.h"
 
 #include <iostream>
+
+float dot(Vec3f a, Vec3f b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+Vec3f cross(Vec3f a, Vec3f b)
+{
+	return Vec3f(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+}
 
 // Bresenham’s line drawing algorithm
 void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color) 
@@ -124,15 +135,18 @@ Vec3f Barycentric(Triangle triangle, Vec2i P)
 }
 
 // Barycentric Coordinate
-void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor defaultCol)
+void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex, TGAImage& image)
 {   
     // Get bounding box of the triangle
     Vec2i bboxMin = Vec2i(image.width() - 1, image.height() - 1);
     Vec2i bboxMax = Vec2i(0, 0);
     Vec2i clamp(image.width() - 1, image.height() - 1);
 
+    // pass vertex data 
     Vec3i pos_faceVertices[3] = { triangle.p0, triangle.p1, triangle.p2 };
     Vec2f uv_faceVertices[3] = { triangle.p0_uv, triangle.p1_uv, triangle.p2_uv };
+    Vec3f normalOS_faceVertices[3] = { triangle.p0_normalOS, triangle.p1_normalOS, triangle.p2_normalOS };
+
     for (int i = 0; i < 3; i++) 
     {
         bboxMin.x = std::max(0, std::min(bboxMin.x, pos_faceVertices[i].x));
@@ -152,9 +166,11 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
             Vec3f bc_screen = Barycentric(triangle, Vec2i(ptSS.x, ptSS.y));
             if (bc_screen.x < 0 || bc_screen.y < 0 || bc_screen.z < 0) continue;
             
-            // lerp z-value by barycentric coordinate
+            // lerp by barycentric coordinate
             ptSS.z = 0;
             Vec2f uv = {0.f, 0.f};
+            Vec3f normalOS = {0.f, 0.f, 0.f};
+
             for (int index = 0; index < 3; index++)
             {
                 float bc_component;
@@ -164,15 +180,27 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
                     case 1: bc_component = bc_screen.y; break;
                     case 2: bc_component = bc_screen.z; break;
                 }
-                ptSS.z += pos_faceVertices[index].z * bc_component;
+                ptSS.z = ptSS.z + pos_faceVertices[index].z * bc_component;
                 uv = uv + uv_faceVertices[index] * bc_component;
+                normalOS = normalOS + normalOS_faceVertices[index] * bc_component;
+
 			}
             // Z Test 
             if (zBuffer[ptSS.x + ptSS.y * image.width()] < ptSS.z)
-            {
+            {   
+                // Z Write 
 				zBuffer[ptSS.x + ptSS.y * image.width()] = ptSS.z;
-                TGAColor col = diffuseTex.get(uv.x * diffuseTex.width(), uv.y * diffuseTex.height());
-                image.set(ptSS.x, ptSS.y, col);
+                // Shading 
+                TGAColor baseCol_TGA = diffuseTex.get(uv.x * diffuseTex.width(), uv.y * diffuseTex.height());
+                Vec3f baseCol = baseCol_TGA.toVec3f();
+                Vec3f lightDirOS = Vec3f(0.f, 0.f, 1.f);
+                Vec3f lightCol = Vec3f(1.0f, 1.0f, 1.0f);
+                float NoL01 = dot(normalOS, lightDirOS) * 0.5f + 0.5f;
+                float zVal = ptSS.z / float(depth);
+
+                //Vec3f finalCol = baseCol * lightCol * NoL01;
+                Vec3f finalCol = zVal;
+                image.set(ptSS.x, ptSS.y, TGAColor(finalCol.x * 255.f, finalCol.y * 255.f, finalCol.z * 255.f, 255.f));
             }
         }
     }
@@ -198,24 +226,16 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& ima
         // transfer to triangle 
         Triangle tri;
         tri.p0 = posSS[0];
-        tri.p1 = posSS[1];
-        tri.p2 = posSS[2];
-
+        tri.p1 = posSS[2];
+        tri.p2 = posSS[1];
         tri.p0_uv = model->uv(faceIdx, 0);
-        tri.p1_uv = model->uv(faceIdx, 2);
-        tri.p2_uv = model->uv(faceIdx, 1);
+        tri.p1_uv = model->uv(faceIdx, 1);
+        tri.p2_uv = model->uv(faceIdx, 2);
+        tri.p0_normalOS = model->normal(faceIdx, 0);
+        tri.p1_normalOS = model->normal(faceIdx, 1);
+        tri.p2_normalOS = model->normal(faceIdx, 2);
 
-        // Blinn-Phong
-        Vec3f lightDirWS = Vec3f(0, 0, -1);
-        Vec3f normalWS = (posWS[2] - posWS[0]) ^ (posWS[1] - posWS[0]);
-        normalWS.normalize();
-        float NoL = normalWS * lightDirWS;
-        float shadingCol = NoL * 255.f;
-
-        if (NoL > 0)
-        {
-            RasterizeTriangle_BC(tri, zBuffer, diffuseTex, image, TGAColor(shadingCol, shadingCol, shadingCol, 255));
-        }
+        RasterizeTriangle_BC(tri, zBuffer, diffuseTex, image);
     }
 }
 
