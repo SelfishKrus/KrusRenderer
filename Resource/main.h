@@ -38,7 +38,8 @@ struct Camera
 {
 	Vec3f posWS;
 	Vec3f lookAt;
-	Vec3f up;
-	Vec3f binormal;
+	Vec3f front;	// z
+	Vec3f up;		// y
+	Vec3f right;	// x
 	float far;
 };

@@ -193,13 +193,14 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
                 // Shading 
                 TGAColor baseCol_TGA = diffuseTex.get(uv.x * diffuseTex.width(), uv.y * diffuseTex.height());
                 Vec3f baseCol = baseCol_TGA.toVec3f();
-                Vec3f lightDirOS = Vec3f(0.f, 0.f, 1.f);
+                Vec3f lightDirWS = Vec3f(1.f, 1.f, 1.f);
+                lightDirWS.normalize();
                 Vec3f lightCol = Vec3f(1.0f, 1.0f, 1.0f);
-                float NoL01 = dot(normalWS, lightDirOS) * 0.5f + 0.5f;
+                float NoL01 = dot(normalWS, lightDirWS) * 0.5f + 0.5f;
                 float zVal = ptSS.z / float(depth);
 
-                Vec3f finalCol = baseCol * lightCol * NoL01;
-                //Vec3f finalCol = zVal;
+                //Vec3f finalCol = baseCol * lightCol * NoL01;
+                Vec3f finalCol = zVal;
                 //Vec3f finalCol = baseCol;
                 image.set(ptSS.x, ptSS.y, TGAColor(finalCol.x * 255.f, finalCol.y * 255.f, finalCol.z * 255.f, 255.f));
             }
@@ -230,9 +231,9 @@ void FlatShading(Model *model, Camera cam, int* zBuffer, TGAImage& diffuseTex, T
             // WS to VS
             Vec3f translationFromCamToOrigion = cam.posWS * -1.0f; // translation
             Matrix matrix_view = Matrix::identity(3); // rotation
-            matrix_view[0][0] = cam.binormal.x; matrix_view[0][1] = cam.binormal.y; matrix_view[0][2] = cam.binormal.z;
+            matrix_view[0][0] = cam.right.x; matrix_view[0][1] = cam.right.y; matrix_view[0][2] = cam.right.z;
             matrix_view[1][0] = cam.up.x; matrix_view[1][1] = cam.up.y; matrix_view[1][2] = cam.up.z;
-            matrix_view[2][0] = cam.lookAt.x; matrix_view[2][1] = cam.lookAt.y; matrix_view[2][2] = cam.lookAt.z;
+            matrix_view[2][0] = cam.front.x; matrix_view[2][1] = cam.front.y; matrix_view[2][2] = cam.front.z;
             
             Vec3f posVS = matrix_view * (posWS + translationFromCamToOrigion);
 
@@ -271,12 +272,13 @@ int main(int argc, char** argv)
     //RasterizeTriangle_BC(triangle, image, red);
     //DrawTriangleWireframe(triangle, image, white);
     Camera cam;
-    cam.posWS = Vec3f(-1.0f, -0.8f, -1.0f);
-    cam.lookAt = Vec3f(0.0f, 0.1f, 0.0f) - cam.posWS; // look at the origin
-    cam.lookAt.normalize();
-    cam.binormal = cross(Vec3f(0.f, 1.f, 0.f), cam.lookAt);
-    cam.binormal.normalize();
-    cam.up = cross(cam.lookAt, cam.binormal);
+    cam.posWS = Vec3f(-0.2f, -0.8f, 1.0f);
+    cam.lookAt = Vec3f(0.0f, -0.2f, 0.0f);
+    cam.front = cam.lookAt - cam.posWS;
+    cam.front.normalize();
+    cam.right = cross(Vec3f(0.f, 1.f, 0.f), cam.front);
+    cam.right.normalize();
+    cam.up = cross(cam.front, cam.right);
     cam.up.normalize();
     cam.far = 3.0f;
 
