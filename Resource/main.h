@@ -22,9 +22,9 @@ struct Triangle
 	Vec2f p0_uv;
 	Vec2f p1_uv;
 	Vec2f p2_uv;
-	Vec3f p0_normalOS;
-	Vec3f p1_normalOS;
-	Vec3f p2_normalOS;
+	Vec3f p0_normal;
+	Vec3f p1_normal;
+	Vec3f p2_normal;
 };
 
 Triangle triangle
@@ -32,4 +32,13 @@ Triangle triangle
 	Vec3i(45, 180, 0),
 	Vec3i(220, 120, 0),
 	Vec3i(130, 50, 0)
+};
+
+struct Camera
+{
+	Vec3f posWS;
+	Vec3f lookAt;
+	Vec3f up;
+	Vec3f binormal;
+	float far;
 };

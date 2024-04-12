@@ -145,7 +145,7 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
     // pass vertex data 
     Vec3i pos_faceVertices[3] = { triangle.p0, triangle.p1, triangle.p2 };
     Vec2f uv_faceVertices[3] = { triangle.p0_uv, triangle.p1_uv, triangle.p2_uv };
-    Vec3f normalOS_faceVertices[3] = { triangle.p0_normalOS, triangle.p1_normalOS, triangle.p2_normalOS };
+    Vec3f normalOS_faceVertices[3] = { triangle.p0_normal, triangle.p1_normal, triangle.p2_normal };
 
     for (int i = 0; i < 3; i++) 
     {
@@ -169,7 +169,7 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
             // lerp by barycentric coordinate
             ptSS.z = 0;
             Vec2f uv = {0.f, 0.f};
-            Vec3f normalOS = {0.f, 0.f, 0.f};
+            Vec3f normalWS = {0.f, 0.f, 0.f};
 
             for (int index = 0; index < 3; index++)
             {
@@ -182,7 +182,7 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
                 }
                 ptSS.z = ptSS.z + pos_faceVertices[index].z * bc_component;
                 uv = uv + uv_faceVertices[index] * bc_component;
-                normalOS = normalOS + normalOS_faceVertices[index] * bc_component;
+                normalWS = normalWS + normalOS_faceVertices[index] * bc_component;
 
 			}
             // Z Test 
@@ -195,18 +195,19 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
                 Vec3f baseCol = baseCol_TGA.toVec3f();
                 Vec3f lightDirOS = Vec3f(0.f, 0.f, 1.f);
                 Vec3f lightCol = Vec3f(1.0f, 1.0f, 1.0f);
-                float NoL01 = dot(normalOS, lightDirOS) * 0.5f + 0.5f;
+                float NoL01 = dot(normalWS, lightDirOS) * 0.5f + 0.5f;
                 float zVal = ptSS.z / float(depth);
 
-                //Vec3f finalCol = baseCol * lightCol * NoL01;
-                Vec3f finalCol = zVal;
+                Vec3f finalCol = baseCol * lightCol * NoL01;
+                //Vec3f finalCol = zVal;
+                //Vec3f finalCol = baseCol;
                 image.set(ptSS.x, ptSS.y, TGAColor(finalCol.x * 255.f, finalCol.y * 255.f, finalCol.z * 255.f, 255.f));
             }
         }
     }
 }
 
-void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor color)
+void FlatShading(Model *model, Camera cam, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor color)
 {   
     for (int faceIdx = 0; faceIdx < (model->nfaces()); faceIdx++)
     {   
@@ -215,12 +216,31 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& ima
 
         // get face-vertex coordinate 
         Vec3i posSS[3];
-        Vec3f posWS[3];
+        Vec3f normal[3];
+
+        // space transform 
         for (int j = 0; j < 3; j++)
-        {
-            Vec3f vertex = model->vert(faceIdx, j);
-            posWS[j] = vertex;
-            posSS[j] = Vec3i((vertex.x + 1.) * width / 2., (vertex.y + 1.) * height / 2., (vertex.z + 1.) * depth / 2.);
+        {   
+            // OS to WS
+            Vec3f posOS = model->vert(faceIdx, j);  // [-1, 1]
+            Vec3f normalOS = model->normal(faceIdx, j);
+            Vec3f posWS = posOS;
+            Vec3f normalWS = normalOS;
+
+            // WS to VS
+            Vec3f translationFromCamToOrigion = cam.posWS * -1.0f; // translation
+            Matrix matrix_view = Matrix::identity(3); // rotation
+            matrix_view[0][0] = cam.binormal.x; matrix_view[0][1] = cam.binormal.y; matrix_view[0][2] = cam.binormal.z;
+            matrix_view[1][0] = cam.up.x; matrix_view[1][1] = cam.up.y; matrix_view[1][2] = cam.up.z;
+            matrix_view[2][0] = cam.lookAt.x; matrix_view[2][1] = cam.lookAt.y; matrix_view[2][2] = cam.lookAt.z;
+            
+            Vec3f posVS = matrix_view * (posWS + translationFromCamToOrigion);
+
+            Vec3f posHCS = posVS;
+            posHCS.z = posHCS.z / cam.far;
+
+            // NDC, Screen Space
+            posSS[j] = Vec3i((posHCS.x + 1.) * width / 2., (posHCS.y + 1.) * height / 2., posHCS.z * depth);
         }
 
         // transfer to triangle 
@@ -231,9 +251,9 @@ void FlatShading(Model *model, int* zBuffer, TGAImage& diffuseTex, TGAImage& ima
         tri.p0_uv = model->uv(faceIdx, 0);
         tri.p1_uv = model->uv(faceIdx, 1);
         tri.p2_uv = model->uv(faceIdx, 2);
-        tri.p0_normalOS = model->normal(faceIdx, 0);
-        tri.p1_normalOS = model->normal(faceIdx, 1);
-        tri.p2_normalOS = model->normal(faceIdx, 2);
+        tri.p0_normal = model->normal(faceIdx, 0);
+        tri.p1_normal = model->normal(faceIdx, 1);
+        tri.p2_normal = model->normal(faceIdx, 2);
 
         RasterizeTriangle_BC(tri, zBuffer, diffuseTex, image);
     }
@@ -250,7 +270,17 @@ int main(int argc, char** argv)
     //DrawWireframe(model, image, white);
     //RasterizeTriangle_BC(triangle, image, red);
     //DrawTriangleWireframe(triangle, image, white);
-    FlatShading(model, zBuffer, diffuseTex, image, red);
+    Camera cam;
+    cam.posWS = Vec3f(-1.0f, -0.8f, -1.0f);
+    cam.lookAt = Vec3f(0.0f, 0.1f, 0.0f) - cam.posWS; // look at the origin
+    cam.lookAt.normalize();
+    cam.binormal = cross(Vec3f(0.f, 1.f, 0.f), cam.lookAt);
+    cam.binormal.normalize();
+    cam.up = cross(cam.lookAt, cam.binormal);
+    cam.up.normalize();
+    cam.far = 3.0f;
+
+    FlatShading(model, cam, zBuffer, diffuseTex, image, red);
 
     // write in 
     //image.flip_vertically();
