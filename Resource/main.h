@@ -38,8 +38,16 @@ struct Camera
 {
 	Vec3f posWS;
 	Vec3f lookAt;
-	Vec3f front;	// z
-	Vec3f up;		// y
-	Vec3f right;	// x
+	Vec3f frontDir;	// z
+	Vec3f upDir;		// y
+	Vec3f rightDir;	// x
+
 	float far;
+	float near;
+	float left;
+	float right;
+	float top;
+	float bottom;
+
+	bool isOrtho;
 };

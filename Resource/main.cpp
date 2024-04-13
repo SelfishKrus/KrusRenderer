@@ -194,13 +194,14 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
                 TGAColor baseCol_TGA = diffuseTex.get(uv.x * diffuseTex.width(), uv.y * diffuseTex.height());
                 Vec3f baseCol = baseCol_TGA.toVec3f();
                 Vec3f lightDirWS = Vec3f(1.f, 1.f, 1.f);
+                //Vec3f lightDirWS = Vec3f(0.f, 0.f, -1.f);
                 lightDirWS.normalize();
                 Vec3f lightCol = Vec3f(1.0f, 1.0f, 1.0f);
                 float NoL01 = dot(normalWS, lightDirWS) * 0.5f + 0.5f;
                 float zVal = ptSS.z / float(depth);
 
-                //Vec3f finalCol = baseCol * lightCol * NoL01;
-                Vec3f finalCol = zVal;
+                Vec3f finalCol = baseCol * lightCol * NoL01;
+                //Vec3f finalCol = zVal;
                 //Vec3f finalCol = baseCol;
                 image.set(ptSS.x, ptSS.y, TGAColor(finalCol.x * 255.f, finalCol.y * 255.f, finalCol.z * 255.f, 255.f));
             }
@@ -208,7 +209,7 @@ void RasterizeTriangle_BC(Triangle triangle, int* zBuffer, TGAImage& diffuseTex,
     }
 }
 
-void FlatShading(Model *model, Camera cam, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor color)
+void FragShading(Model *model, Camera cam, int* zBuffer, TGAImage& diffuseTex, TGAImage& image, TGAColor color)
 {   
     for (int faceIdx = 0; faceIdx < (model->nfaces()); faceIdx++)
     {   
@@ -231,17 +232,47 @@ void FlatShading(Model *model, Camera cam, int* zBuffer, TGAImage& diffuseTex, T
             // WS to VS
             Vec3f translationFromCamToOrigion = cam.posWS * -1.0f; // translation
             Matrix matrix_view = Matrix::identity(3); // rotation
-            matrix_view[0][0] = cam.right.x; matrix_view[0][1] = cam.right.y; matrix_view[0][2] = cam.right.z;
-            matrix_view[1][0] = cam.up.x; matrix_view[1][1] = cam.up.y; matrix_view[1][2] = cam.up.z;
-            matrix_view[2][0] = cam.front.x; matrix_view[2][1] = cam.front.y; matrix_view[2][2] = cam.front.z;
+            matrix_view[0][0] = cam.rightDir.x; matrix_view[0][1] = cam.rightDir.y; matrix_view[0][2] = cam.rightDir.z;
+            matrix_view[1][0] = cam.upDir.x; matrix_view[1][1] = cam.upDir.y; matrix_view[1][2] = cam.upDir.z;
+            matrix_view[2][0] = cam.frontDir.x; matrix_view[2][1] = cam.frontDir.y; matrix_view[2][2] = cam.frontDir.z;
             
             Vec3f posVS = matrix_view * (posWS + translationFromCamToOrigion);
 
-            Vec3f posHCS = posVS;
-            posHCS.z = posHCS.z / cam.far;
+            // VS to HCS
+            // perspective transformation 
+            Matrix matrix_persToOrtho = Matrix::identity(4);
+            matrix_persToOrtho[0][0] = cam.near;
+            matrix_persToOrtho[1][1] = cam.near;
+            matrix_persToOrtho[2][2] = cam.near + cam.far;
+            matrix_persToOrtho[2][3] = -cam.near * cam.far;
+            matrix_persToOrtho[3][2] = 1.0f;
+
+            Matrix matrix_ortho_translate = Matrix::identity(4);
+            //matrix_ortho_translate[0][3] = -(cam.right + cam.left) / 2.0f;
+            //matrix_ortho_translate[1][3] = -(cam.top + cam.bottom) / 2.0f;
+            //matrix_ortho_translate[2][3] = -(cam.far + cam.near) / 2.0f;
+            Matrix matrix_ortho_scale = Matrix::identity(4);
+            matrix_ortho_scale[0][0] = 2.0f / (cam.right - cam.left);
+            matrix_ortho_scale[1][1] = 2.0f / (cam.top - cam.bottom);
+            matrix_ortho_scale[2][2] = 2.0f / (cam.near - cam.far);
+
+            Matrix matrix_ortho = matrix_ortho_scale * matrix_ortho_translate;
+
+            Vec4f posHCS;
+            if (cam.isOrtho == true)
+            {
+                posHCS = matrix_ortho * Vec4f(posVS.x, posVS.y, posVS.z, 1.0f);
+            }
+            else
+            {
+                posHCS = matrix_ortho * matrix_persToOrtho * Vec4f(posVS.x, posVS.y, posVS.z, 1.0f);
+            }
+
+            // HCS to NDC
+            Vec4f posNDC = posHCS / posHCS.w;
 
             // NDC, Screen Space
-            posSS[j] = Vec3i((posHCS.x + 1.) * width / 2., (posHCS.y + 1.) * height / 2., posHCS.z * depth);
+            posSS[j] = Vec3i((posNDC.x + 1.) * width / 2., (posNDC.y + 1.) * height / 2., posNDC.z * depth);
         }
 
         // transfer to triangle 
@@ -272,17 +303,24 @@ int main(int argc, char** argv)
     //RasterizeTriangle_BC(triangle, image, red);
     //DrawTriangleWireframe(triangle, image, white);
     Camera cam;
-    cam.posWS = Vec3f(-0.2f, -0.8f, 1.0f);
-    cam.lookAt = Vec3f(0.0f, -0.2f, 0.0f);
-    cam.front = cam.lookAt - cam.posWS;
-    cam.front.normalize();
-    cam.right = cross(Vec3f(0.f, 1.f, 0.f), cam.front);
-    cam.right.normalize();
-    cam.up = cross(cam.front, cam.right);
-    cam.up.normalize();
-    cam.far = 3.0f;
+    cam.posWS = Vec3f(1.0f, 0.f, 1.0f);
+    cam.lookAt = Vec3f(0.0f, 0.0f, 0.0f);
+    cam.frontDir = cam.lookAt - cam.posWS;
+    cam.frontDir.normalize();
+    cam.rightDir = cross(Vec3f(0.f, 1.f, 0.f), cam.frontDir);
+    cam.rightDir.normalize();
+    cam.upDir = cross(cam.frontDir, cam.rightDir);
+    cam.upDir.normalize();
+    cam.far = 5.0f;
+    cam.near = 1.5f;
+    cam.left = -1.0f;
+    cam.right = 1.0f;
+    cam.top = 1.0f;
+    cam.bottom = -1.0f;
 
-    FlatShading(model, cam, zBuffer, diffuseTex, image, red);
+    cam.isOrtho = false;
+
+    FragShading(model, cam, zBuffer, diffuseTex, image, red);
 
     // write in 
     //image.flip_vertically();
