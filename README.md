@@ -1,5 +1,6 @@
 # KrusRenderer
 A leanring project of soft rasterizer.
+
 ### Personal Notes: 
 https://sleepy-badge-984.notion.site/TinyRenderer-22458c8f05724d909f9907847c6b668b?pvs=4
 
